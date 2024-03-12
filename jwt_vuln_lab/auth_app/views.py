@@ -90,25 +90,26 @@ def jwt_required(f):
     return wrap
 
 def get_tokens_for_user(user):
+    print("here1")
     # Load your private key
     with open(PRIVATE_KEY_PATH, 'r') as f:
         private_key = f.read()
-
+    print("here2")
     # Payload of the JWT
     payload = {
         'user_id': user.id,  # User identification
         'exp': datetime.utcnow() + timedelta(minutes=60),  # Token expiration time
         'iat': datetime.utcnow(),  # Issued at time
     }
-
+    print("here3")
     # Headers with the 'jku' URL
     headers = {
-        'jku': 'http://127.0.0.1:8003/jwks.json',
+        'jku': 'http://0.0.0.0:8003/jwks.json',
     }
-
+    print("here1")
     # Sign the payload with the RS256 algorithm, including the 'jku' header
     token = jwt.encode(payload, private_key, algorithm='RS256', headers=headers)
-    
+    print("here1")
     return {'access': token}
 
 def jwt_required(f):
@@ -158,10 +159,10 @@ def my_login_view(request):
         if user is not None:
             print("log2b")
             tokens = get_tokens_for_user(user)
-            response = redirect(reverse('home_page'))
             print("log2c")
             response.set_cookie(key='access', value=tokens['access'], httponly=True)
-            return response
+            print("log2d")
+            return render(request, 'home.html')
         else:
             print("logxx")
             return render(request, 'login.html', {'error': 'Invalid credentials'})
