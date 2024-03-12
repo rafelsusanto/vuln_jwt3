@@ -51,7 +51,7 @@ def verify_jwt(token):
     # print(f'jwk jwks {jwk} {jwks}')
     # Construct a public key instance from the JWK
     public_key = jwt.algorithms.RSAAlgorithm.from_jwk(jwk)
-    print(f"here {public_key}")
+    print(f"token {token} public key {public_key}")
     # Now verify the JWT using the public key
     decoded = jwt.decode(token, public_key, algorithms=['RS256'])
     print(decoded)
