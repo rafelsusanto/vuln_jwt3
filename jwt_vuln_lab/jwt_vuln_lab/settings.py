@@ -88,11 +88,13 @@ WSGI_APPLICATION = 'jwt_vuln_lab.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jwt1',
+        'NAME': 'django_vuln_jwt3',
         'HOST': 'localhost',
         'PORT': '3306',
-        'USER': 'jwt_user',
-        'PASSWORD': 'H4a89fsj@!fwa',
+        # 'USER': 'jwt_user',
+        # 'PASSWORD': 'H4a89fsj@!fwa',
+        'USER': 'root',
+        'PASSWORD': '',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },

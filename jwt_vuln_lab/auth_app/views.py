@@ -131,6 +131,7 @@ def jwt_required(f):
     return wrap
 
 def my_login_view(request):
+    print("log1")
     access_token = request.COOKIES.get('access')
     if access_token:
         try:
@@ -148,7 +149,7 @@ def my_login_view(request):
         response = render(request, 'login.html')
         response.delete_cookie('access')
         return response
-
+    print("log2")
     # Handle login attempt
     if request.method == "POST":
         username = request.POST.get('username')
