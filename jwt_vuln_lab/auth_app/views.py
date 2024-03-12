@@ -155,17 +155,15 @@ def my_login_view(request):
         response = render(request, 'login.html')
         response.delete_cookie('access')
         return response
-    print("log2")
+    # print("log2")
     # Handle login attempt
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
-        print("log2a")
         if user is not None:
-            print("log2b")
             tokens = get_tokens_for_user(user)
-            print("log2c")
+            print(f"tokens = {tokens}")
             response.set_cookie(key='access', value=tokens['access'], httponly=True)
             print("log2d")
             return render(request, 'home.html')
