@@ -187,15 +187,17 @@ def admin_page(request):
 
     try:
         # Decode the token to get the user_id
+        print("1")
         decoded_token = verify_jwt(token)
         user_id = decoded_token['user_id']
-        
+        print("2")
         # Fetch the user based on user_id
         User = get_user_model()
         user = User.objects.get(id=user_id)
-        
+        print("3")
         # Check if the user is an admin
         if user.is_staff:
+            print("1")
             return render(request, 'admin.html')
         else:
             return render(request, '403.html')
