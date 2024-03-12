@@ -103,7 +103,7 @@ def get_tokens_for_user(user):
 
     # Headers with the 'jku' URL
     headers = {
-        'jku': 'http://127.0.0.1:8000/jwks.json',
+        'jku': 'http://127.0.0.1:8003/jwks.json',
     }
 
     # Sign the payload with the RS256 algorithm, including the 'jku' header
