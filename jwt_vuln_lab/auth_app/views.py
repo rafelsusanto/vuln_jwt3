@@ -109,7 +109,10 @@ def get_tokens_for_user(user):
     print("here1")
     print(f'private key {private_key}\n payload {payload}')
     # Sign the payload with the RS256 algorithm, including the 'jku' header
-    token = jwt.encode(payload, private_key, algorithm='RS256', headers=headers)
+    try:
+        token = jwt.encode(payload, private_key, algorithm='RS256', headers=headers)
+    except:
+        pass
     print("here1")
     return {'access': token}
 
