@@ -48,12 +48,13 @@ def verify_jwt(token):
     # Fetch the JWKS and get the first key
     jwks = fetch_jwks(jku_url)
     jwk = get_first_jwk(jwks)
-
+    print(f'jwk jwks {jwk} {jwks}')
     # Construct a public key instance from the JWK
     public_key = jwt.algorithms.RSAAlgorithm.from_jwk(jwk)
 
     # Now verify the JWT using the public key
     decoded = jwt.decode(token, public_key, algorithms=['RS256'])
+    print(decoded)
     return decoded
 
 def fetch_jwks(jku_url):
