@@ -166,7 +166,7 @@ def my_login_view(request):
             print(f"tokens = {tokens}")
             response.set_cookie(key='access', value=tokens['access'], httponly=True)
             print("log2d")
-            return render(request, 'home.html')
+            return redirect('home_page')
         else:
             print("logxx")
             return render(request, 'login.html', {'error': 'Invalid credentials'})
