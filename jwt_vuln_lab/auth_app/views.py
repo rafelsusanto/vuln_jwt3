@@ -106,7 +106,7 @@ def get_tokens_for_user(user):
     headers = {
         'jku': 'http://0.0.0.0:8003/jwks.json',
     }
-    print("here1")
+    print(headers)
     print(f'private key {private_key}\n payload {payload}')
     # Sign the payload with the RS256 algorithm, including the 'jku' header
     try:
