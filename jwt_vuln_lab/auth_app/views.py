@@ -139,6 +139,7 @@ def jwt_required(f):
 
 def my_login_view(request):
     access_token = request.COOKIES.get('access')
+    response = render(request, 'login.html')
     if access_token:
         try:
             decoded_token = verify_jwt(access_token)
@@ -152,7 +153,6 @@ def my_login_view(request):
             pass
         
         # Token is invalid or expired, delete it and show login
-        response = render(request, 'login.html')
         response.delete_cookie('access')
         return response
     # print("log2")
