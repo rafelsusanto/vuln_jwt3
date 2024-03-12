@@ -90,31 +90,31 @@ def jwt_required(f):
     return wrap
 
 def get_tokens_for_user(user):
-    print("here1")
+    # print("here1")
     # Load your private key
     with open(PRIVATE_KEY_PATH, 'r') as f:
         private_key = f.read()
-    print("here2")
+    # print("here2")
     # Payload of the JWT
     payload = {
         'user_id': user.id,  # User identification
         'exp': datetime.utcnow() + timedelta(minutes=60),  # Token expiration time
         'iat': datetime.utcnow(),  # Issued at time
     }
-    print("here3")
+    # print("here3")
     # Headers with the 'jku' URL
     headers = {
         'jku': 'http://0.0.0.0:8003/jwks.json',
     }
-    print(headers)
-    print(f'private key {private_key}\n payload {payload}')
+    # print(headers)
+    # print(f'private key {private_key}\n payload {payload}')
     # Sign the payload with the RS256 algorithm, including the 'jku' header
     try:
         token = jwt.encode(payload, private_key, algorithm='RS256', headers=headers)
     except:
         print("fail to encode")
         pass
-    print("here1")
+    # print("here1")
     print(token)
     return {'access': token}
 
