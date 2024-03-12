@@ -190,7 +190,7 @@ def admin_page(request):
         print("1")
         decoded_token = verify_jwt(token)
         user_id = decoded_token['user_id']
-        print("2")
+        print(f"decoded token {decoded_token}\nuserid {user_id}")
         # Fetch the user based on user_id
         User = get_user_model()
         user = User.objects.get(id=user_id)
