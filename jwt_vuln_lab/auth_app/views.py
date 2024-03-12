@@ -125,7 +125,9 @@ def jwt_required(f):
         token = request.COOKIES.get('access', None)
         if token:
             try:
+                print("try decode token")
                 decoded_token = verify_jwt(token)
+                print(decoded_token)
                 user_id = decoded_token['user_id']
                 print(user_id)
                 user = User.objects.get(id=user_id)
