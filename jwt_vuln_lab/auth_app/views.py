@@ -112,8 +112,10 @@ def get_tokens_for_user(user):
     try:
         token = jwt.encode(payload, private_key, algorithm='RS256', headers=headers)
     except:
+        print("fail to encode")
         pass
     print("here1")
+    print(token)
     return {'access': token}
 
 def jwt_required(f):
