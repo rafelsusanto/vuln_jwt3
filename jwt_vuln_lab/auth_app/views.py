@@ -131,7 +131,6 @@ def jwt_required(f):
     return wrap
 
 def my_login_view(request):
-    print("log1")
     access_token = request.COOKIES.get('access')
     if access_token:
         try:
@@ -155,12 +154,16 @@ def my_login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
+        print("log2a")
         if user is not None:
+            print("log2b")
             tokens = get_tokens_for_user(user)
             response = redirect(reverse('home_page'))
+            print("log2c")
             response.set_cookie(key='access', value=tokens['access'], httponly=True)
             return response
         else:
+            print("logxx")
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     else:
         return render(request, 'login.html')
