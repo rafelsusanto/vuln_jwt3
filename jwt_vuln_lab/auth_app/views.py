@@ -46,17 +46,20 @@ def custom_verify_jwt(token):
         raise InvalidTokenError("JKU URL not found in token header")
 
     # Fetch the JWKS and get the first key
-    jwks = fetch_jwks(jku_url)
-    jwk = get_first_jwk(jwks)
-    print(f"jwk = {jwk}")
-    # print(f'jwk jwks {jwk} {jwks}')
-    # Construct a public key instance from the JWK
-    public_key = jwt.algorithms.RSAAlgorithm.from_jwk(jwk)
-    print(f"token {token} public key {public_key}")
-    # Now verify the JWT using the public key
-    decoded = jwt.decode(token, public_key, algorithms=['RS256'])
-    print(decoded)
-    return decoded
+    try:
+        jwks = fetch_jwks(jku_url)
+        jwk = get_first_jwk(jwks)
+        print(f"jwk = {jwk}")
+        # print(f'jwk jwks {jwk} {jwks}')
+        # Construct a public key instance from the JWK
+        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(jwk)
+        print(f"token {token} public key {public_key}")
+        # Now verify the JWT using the public key
+        decoded = jwt.decode(token, public_key, algorithms=['RS256'])
+        print(decoded)
+        return decoded
+    except:
+        print("verify fail!!!")
 
 def fetch_jwks(jku_url):
     """Fetch the JWKS from the specified URL."""
