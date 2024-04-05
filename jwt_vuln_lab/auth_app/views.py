@@ -40,20 +40,15 @@ PRIVATE_KEY_PATH = os.path.join(current_dir, 'private.pem')
 def custom_verify_jwt(token):
     """Verify a JWT against the JWKS fetched from the JKU URL in the token's header."""
     # Decode the token without verification to extract the JKU URL from the headers
-    print("debug1")
     unverified_header = jwt.get_unverified_header(token)
-    print("debug1")
     jku_url = unverified_header.get('jku')
-    print("debug1")
     if not jku_url:
         raise InvalidTokenError("JKU URL not found in token header")
 
     # Fetch the JWKS and get the first key
-    print("debug1")
     jwks = fetch_jwks(jku_url)
-    print("debug2")
     jwk = get_first_jwk(jwks)
-    print("debug3")
+    print(f"jwk = {jwk}")
     # print(f'jwk jwks {jwk} {jwks}')
     # Construct a public key instance from the JWK
     public_key = jwt.algorithms.RSAAlgorithm.from_jwk(jwk)
@@ -105,6 +100,8 @@ def get_tokens_for_user(user):
         pass
     # print("here1")
     print(token)
+    if isinstance(token, bytes):
+        token = token.decode('utf-8')
     return {'access': token}
 
 def jwt_required(f):
