@@ -31,6 +31,13 @@ import jwt
 import requests
 from functools import wraps
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.hazmat.primitives import hashes
+import base64
+
 
 # Get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -50,9 +57,18 @@ def custom_verify_jwt(token):
         jwks = fetch_jwks(jku_url)
         jwk = get_first_jwk(jwks)
         print(f"jwk = {jwk}")
+        print(f"token = {token}")
         # print(f'jwk jwks {jwk} {jwks}')
         # Construct a public key instance from the JWK
-        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(jwk)
+        
+        # public_key = jwt.algorithms.RSAAlgorithm.from_jwk(jwk)
+        n = base64.urlsafe_b64decode(jwk['n'] + '==')
+        e = base64.urlsafe_b64decode(jwk['e'] + '==')
+        n_int = int.from_bytes(n, byteorder='big')
+        e_int = int.from_bytes(e, byteorder='big')
+
+        public_key = rsa.RSAPublicNumbers(e_int, n_int).public_key(default_backend())
+
         print(f"token {token} public key {public_key}")
         # Now verify the JWT using the public key
         decoded = jwt.decode(token, public_key, algorithms=['RS256'])
