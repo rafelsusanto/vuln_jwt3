@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.http import HttpResponseRedirect
 
 # Third-party libraries imports
 import jwt
@@ -36,18 +37,23 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the path to the private key file
 PRIVATE_KEY_PATH = os.path.join(current_dir, 'private.pem')
-def verify_jwt(token):
+def custom_verify_jwt(token):
     """Verify a JWT against the JWKS fetched from the JKU URL in the token's header."""
     # Decode the token without verification to extract the JKU URL from the headers
+    print("debug1")
     unverified_header = jwt.get_unverified_header(token)
+    print("debug1")
     jku_url = unverified_header.get('jku')
-
+    print("debug1")
     if not jku_url:
         raise InvalidTokenError("JKU URL not found in token header")
 
     # Fetch the JWKS and get the first key
+    print("debug1")
     jwks = fetch_jwks(jku_url)
+    print("debug2")
     jwk = get_first_jwk(jwks)
+    print("debug3")
     # print(f'jwk jwks {jwk} {jwks}')
     # Construct a public key instance from the JWK
     public_key = jwt.algorithms.RSAAlgorithm.from_jwk(jwk)
@@ -72,24 +78,6 @@ def get_first_jwk(jwks):
         raise Exception("No keys found in JWKS.")
     return keys[0]  # Use the first key
 
-def jwt_required(f):
-    @wraps(f)
-    def wrap(request, *args, **kwargs):
-        User = get_user_model()
-        token = request.COOKIES.get('access', None)
-        if token:
-            try:
-                decoded_token = verify_jwt(token)
-                user_id = decoded_token['user_id']
-                user = User.objects.get(id=user_id)
-                request.user = user
-                return f(request, *args, **kwargs)
-            except (jwt.ExpiredSignatureError, jwt.PyJWTError, User.DoesNotExist):
-                # Log or handle invalid or expired token and user not found cases here
-                pass
-        return redirect(settings.LOGIN_URL)
-    return wrap
-
 def get_tokens_for_user(user):
     # print("here1")
     # Load your private key
@@ -105,7 +93,7 @@ def get_tokens_for_user(user):
     # print("here3")
     # Headers with the 'jku' URL
     headers = {
-        'jku': 'http://0.0.0.0:8003/jwks.json',
+        'jku': 'http://127.0.0.1:8003/jwks.json',
     }
     # print(headers)
     # print(f'private key {private_key}\n payload {payload}')
@@ -126,17 +114,22 @@ def jwt_required(f):
         token = request.COOKIES.get('access', None)
         if token:
             try:
-                print("try decode token")
-                decoded_token = verify_jwt(token)
+                print("try decode token12")
+                # Ensure verify_jwt uses the 'RS256' algorithm explicitly
+                decoded_token = custom_verify_jwt(token)  
                 print(decoded_token)
                 user_id = decoded_token['user_id']
                 print(user_id)
                 user = User.objects.get(id=user_id)
                 request.user = user
                 return f(request, *args, **kwargs)
-            except (jwt.ExpiredSignatureError, jwt.PyJWTError, User.DoesNotExist):
-                # Log or handle invalid or expired token and user not found cases here
-                pass
+            except:
+                print("token error")
+                # Clear the invalid "access" cookie
+                response = redirect(settings.LOGIN_URL)
+                response.delete_cookie('access')
+                return response
+        # No valid token in cookie; redirect to LOGIN_URL
         return redirect(settings.LOGIN_URL)
     return wrap
 
@@ -145,7 +138,7 @@ def my_login_view(request):
     # response = render(request, 'login.html')
     if access_token:
         try:
-            decoded_token = verify_jwt(access_token)
+            decoded_token = custom_verify_jwt(access_token)
             # If verification is successful, proceed
             return redirect(reverse('home_page'))
         except jwt.ExpiredSignatureError:
@@ -191,7 +184,7 @@ def admin_page(request):
     try:
         # Decode the token to get the user_id
         print("1")
-        decoded_token = verify_jwt(token)
+        decoded_token = custom_verify_jwt(token)
         user_id = decoded_token['user_id']
         print(f"decoded token {decoded_token}\nuserid {user_id}")
         # Fetch the user based on user_id
@@ -213,7 +206,7 @@ def logout(request):
     if token:
         try:
             # Attempt to decode the token
-            decoded_token = verify_jwt(token)
+            decoded_token = custom_verify_jwt(token)
             expires_at = timezone.datetime.fromtimestamp(decoded_token['exp'], timezone.utc)
             
             # Add the token to the blacklist
